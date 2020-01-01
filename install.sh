@@ -141,7 +141,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
       JULIA_VERSION_INFO=`julia --version`
       echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
     else
-      brew cast install julia
+      brew cask install julia
     fi
 
     # Install dependencies
