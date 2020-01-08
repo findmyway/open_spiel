@@ -105,7 +105,9 @@ if [[ ${FLAGS_virtualenv} -eq ${FLAGS_TRUE} ]]; then
 fi
 
 if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
+  JULIA_VERSION_INFO=`julia --version`
   JlCxx_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx"))'`
+  echo "Found JlCxx at $JlCxx_DIR with $JULIA_VERSION_INFO"
 fi
 
 # We only exit the virtualenv if we were asked to create one.
