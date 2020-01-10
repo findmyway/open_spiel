@@ -96,7 +96,12 @@ if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
     JULIA_VERSION_INFO=`julia --version`
     echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
   else
-    JULIA_VERSION=1.3.1 bash -ci "$(curl -fsSL https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh)" -y
+    JULIA_DOWNLOADER="open_spiel/scripts/jill.sh"
+    if [[ ! -f $JULIA_DOWNLOADER ]]; then
+    curl https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh -o jill.sh
+    mv jill.sh $JULIA_DOWNLOADER
+    fi
+    JULIA_VERSION=1.3.1 bash $JULIA_DOWNLOADER -y
   fi
 
   # Install dependencies
