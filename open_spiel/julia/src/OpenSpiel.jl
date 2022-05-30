@@ -1,12 +1,15 @@
 module OpenSpiel
 
 include("$(@__DIR__)/../deps/deps.jl")
+libspieljl = LIB_OPEN_SPIEL 
+# using OpenSpiel_jll
+# libspieljl = "/root/test/Yggdrasil/O/OpenSpiel/products/lib/libspieljl.so"
 
 using CxxWrap
 import CxxWrap:argument_overloads
 import Base: step, first, last
 
-@wrapmodule(LIB_OPEN_SPIEL)
+@wrapmodule(libspieljl)
 
 include("patch.jl")
 

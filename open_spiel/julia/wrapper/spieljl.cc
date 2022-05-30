@@ -145,37 +145,6 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
       .method("to_string", &open_spiel::GameParameter::ToString)
       .method("to_repr_string", &open_spiel::GameParameter::ToReprString);
 
-  // !!! not a good pratice to do so
-  mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>, jlcxx::TypeVar<2>>>(
-         "StdMap", jlcxx::julia_type("AbstractDict", "Base"))
-      .apply<std::map<std::string, open_spiel::GameParameter>,
-             std::unordered_map<open_spiel::Action, double>,
-             std::unordered_map<std::string, open_spiel::Action>,
-             std::unordered_map<std::string, open_spiel::ActionsAndProbs>,
-             std::unordered_map<std::string, int>>([](auto wrapped) {
-        typedef typename decltype(wrapped)::type WrappedT;
-        typedef typename WrappedT::key_type WrappedKey;
-        typedef typename WrappedT::mapped_type WrappedVal;
-
-        wrapped.module().set_override_module(jl_base_module);
-
-        wrapped.method("length", &WrappedT::size);
-        wrapped.method("getindex",
-                       [](WrappedT& w, WrappedKey& k) { return w[k]; });
-        wrapped.method("setindex!", [](WrappedT& w, WrappedVal& v,
-                                       WrappedKey& k) { return w[k] = v; });
-        wrapped.method("keys", [](WrappedT ps) {
-          std::vector<WrappedKey> keys;
-          keys.reserve(ps.size());
-          for (auto const& it : ps) {
-            keys.emplace_back(it.first);
-          }
-          return keys;
-        });
-
-        wrapped.module().unset_override_module();
-      });
-
   mod.add_bits<open_spiel::StateType>("StateType",
                                       jlcxx::julia_type("CppEnum"));
   mod.set_const("TERMINAL_STATE", open_spiel::StateType::kTerminal);
@@ -424,19 +393,11 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
                 const std::vector<std::vector<double>>& b) {
                return open_spiel::matrix_game::CreateMatrixGame(a, b);
              });
-  mod.method("_load_game",
+  mod.method("load_game",
              [](const std::string& s) { return open_spiel::LoadGame(s); });
-  mod.method("_load_game",
-             [](const std::string& s, const open_spiel::GameParameters& ps) {
-               return open_spiel::LoadGame(s, ps);
-             });
-  mod.method("_load_game_as_turn_based", [](const std::string& s) {
+  mod.method("load_game_as_turn_based", [](const std::string& s) {
     return open_spiel::LoadGameAsTurnBased(s);
   });
-  mod.method("_load_game_as_turn_based",
-             [](const std::string& s, const open_spiel::GameParameters& ps) {
-               return open_spiel::LoadGameAsTurnBased(s, ps);
-             });
   mod.method("load_matrix_game", &open_spiel::algorithms::LoadMatrixGame);
   mod.method("extensive_to_matrix_game",
              &open_spiel::algorithms::ExtensiveToMatrixGame);
